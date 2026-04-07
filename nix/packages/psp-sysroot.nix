@@ -23,7 +23,13 @@ runCommand "psp-sysroot" { } ''
     cp -af ${pspsdk}/psp/sdk/include/. $out/psp/include/
   fi
 
+  if [ -d ${pspsdk}/psp/lib ]; then
+    cp -af ${pspsdk}/psp/lib/. $out/psp/lib/
+    chmod -R u+w $out/psp/lib
+  fi
+
   if [ -d ${pspsdk}/psp/sdk/lib ]; then
+    chmod -R u+w $out/psp/lib
     cp -af ${pspsdk}/psp/sdk/lib/. $out/psp/lib/
   fi
 

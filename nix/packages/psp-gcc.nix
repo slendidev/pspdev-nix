@@ -21,6 +21,7 @@
 }:
 let
   version = "allegrex-v15.2.0";
+  gccVersion = lib.removePrefix "allegrex-v" version;
 in
 stdenv.mkDerivation rec {
   pname = "psp-gcc";
@@ -122,5 +123,15 @@ stdenv.mkDerivation rec {
     done
 
     runHook postInstall
+  '';
+
+  # Run after fixup/strip to avoid ending up with a stale archive index.
+  postFixup = ''
+    libgcc="$out/lib/gcc/psp/${gccVersion}/libgcc.a"
+    if [ -f "$libgcc" ]; then
+      chmod u+w "$libgcc"
+      ${psp-binutils}/bin/psp-ranlib -D "$libgcc"
+      chmod u-w "$libgcc"
+    fi
   '';
 }

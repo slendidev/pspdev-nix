@@ -3,6 +3,7 @@
   makeWrapper,
   cmake,
   pspsdk,
+  psp-gcc,
 }:
 stdenv.mkDerivation {
   pname = "psp-cmake";
@@ -14,13 +15,42 @@ stdenv.mkDerivation {
   installPhase = ''
     runHook preInstall
     mkdir -p "$out/bin"
-    cat > "$out/bin/psp-cmake" <<'EOF'
-    #!${stdenv.shell}
-    if [ -z "''${PSPDEV}" ]; then
-      export PSPDEV="${pspsdk}"
-    fi
-    exec ${cmake}/bin/cmake -DCMAKE_TOOLCHAIN_FILE="''${PSPDEV}/psp/share/pspdev.cmake" "$@"
+    mkdir -p "$out/share/pspdev-nix"
+
+    cat > "$out/share/pspdev-nix/psp-toolchain.cmake" <<'EOF'
+    if(DEFINED ENV{PSPDEV})
+      set(PSPDEV $ENV{PSPDEV})
+    else()
+      message(FATAL_ERROR "The environment variable PSPDEV needs to be defined.")
+    endif()
+
+    include("''${PSPDEV}/psp/share/pspdev.cmake")
+
+    # Avoid PATH-dependent compiler resolution.
+    set(CMAKE_C_COMPILER "${psp-gcc}/bin/psp-gcc" CACHE FILEPATH "" FORCE)
+    set(CMAKE_CXX_COMPILER "${psp-gcc}/bin/psp-g++" CACHE FILEPATH "" FORCE)
+
+    if(NOT DEFINED CMAKE_C_STANDARD_LIBRARIES OR CMAKE_C_STANDARD_LIBRARIES STREQUAL "")
+      set(CMAKE_C_STANDARD_LIBRARIES "-lc -lm -lpthreadglue -lpthread -lcglue -lgcc" CACHE STRING "" FORCE)
+    endif()
+
+    if(NOT DEFINED CMAKE_CXX_STANDARD_LIBRARIES OR CMAKE_CXX_STANDARD_LIBRARIES STREQUAL "")
+      set(CMAKE_CXX_STANDARD_LIBRARIES "-lc -lm -lpthreadglue -lpthread -lcglue -lgcc" CACHE STRING "" FORCE)
+    endif()
     EOF
+
+    cat > "$out/bin/psp-cmake" <<'EOF'
+    #!@shell@
+    if [ -z "''${PSPDEV}" ]; then
+      export PSPDEV="@pspdev@"
+    fi
+    exec @cmake@ -DCMAKE_TOOLCHAIN_FILE="@out@/share/pspdev-nix/psp-toolchain.cmake" "''$@"
+    EOF
+    substituteInPlace "$out/bin/psp-cmake" \
+      --replace "@shell@" "${stdenv.shell}" \
+      --replace "@pspdev@" "${pspsdk}" \
+      --replace "@cmake@" "${cmake}/bin/cmake" \
+      --replace "@out@" "$out"
     chmod +x "$out/bin/psp-cmake"
     runHook postInstall
   '';
