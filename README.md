@@ -17,7 +17,7 @@ In a `flake.nix` add the following:
     };
   };
 
-  outputs = inputs@{ flake-parts, ... }:
+  outputs = inputs@{ nixpkgs, flake-parts, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = nixpkgs.lib.systems.flakeExposed;
 
