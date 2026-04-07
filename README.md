@@ -29,7 +29,7 @@ In a `flake.nix` add the following:
 ```
 
 You should then be able to run `nix develop`, or if you have
-(https://github.com/nix-community/nix-direnv)[nix-direnv] installed, add to
+[nix-direnv](https://github.com/nix-community/nix-direnv) installed, add to
 .envrc:
 
 ```
