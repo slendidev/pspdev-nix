@@ -4,6 +4,7 @@ pkgs.mkShell {
     packages.psp-binutils
     packages.psp-gcc
     packages.pspsdk
+    packages.psplink
     packages.psplinkusb
     packages.ebootsigner
     packages.psp-cmake

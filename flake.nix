@@ -28,6 +28,7 @@
                 my.psp-binutils
                 my.psp-gcc
                 my.pspsdk
+                my.psplink
                 my.psplinkusb
                 my.ebootsigner
                 my.psp-cmake
@@ -42,6 +43,7 @@
         };
 
       flake = {
+        lib.pspMkDerivation = { pkgs }: pkgs.callPackage ./nix/psp-mk-derivation.nix { };
         overlays.default = import ./nix/overlays.nix;
       };
     };
