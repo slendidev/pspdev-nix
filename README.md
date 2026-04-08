@@ -37,4 +37,3 @@ use flake
 ```
 
 And you should be good to go!
-
