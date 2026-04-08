@@ -1,0 +1,7 @@
+result*
+[Bb]uild*
+.direnv
+*.SFO
+*.PBP
+*.prx
+*.elf

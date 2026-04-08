@@ -51,6 +51,10 @@
             path = ./src/templates/cmake;
             description = "PSP hello world template using CMake";
           };
+          sdl2 = {
+            path = ./src/templates/sdl2;
+            description = "PSP SDL2 template using CMake";
+          };
         };
       };
     };
