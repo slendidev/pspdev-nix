@@ -46,7 +46,16 @@ stdenv.mkDerivation {
     if [ -z "''${PSPDEV}" ]; then
       export PSPDEV="@pspdev@"
     fi
-    exec @cmake@ -DCMAKE_TOOLCHAIN_FILE="@out@/share/pspdev-nix/psp-toolchain.cmake" "''$@"
+
+    for arg in "$@"; do
+      case "$arg" in
+        --build|--install|--open|-P|-E|--find-package)
+          exec @cmake@ "$@"
+          ;;
+      esac
+    done
+
+    exec @cmake@ -DCMAKE_TOOLCHAIN_FILE="@out@/share/pspdev-nix/psp-toolchain.cmake" "$@"
     EOF
     substituteInPlace "$out/bin/psp-cmake" \
       --replace "@shell@" "${stdenv.shell}" \
