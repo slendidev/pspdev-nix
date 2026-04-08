@@ -107,6 +107,10 @@ stdenv.mkDerivation rec {
     export PATH=$PWD/.toolwrap/bin:${psp-binutils}/bin:${psp-gcc-bootstrap}/bin:$PATH
     make install
 
+    cat >> "$out/psp/sdk/lib/build.mak" <<'EOF'
+    CFLAGS += -I$(HOME)/.local/share/pspdev/psp/include -L$(HOME)/.local/share/pspdev/psp/lib
+    EOF
+
     cat > .libgcc-compat.c <<'EOF'
     typedef unsigned int su_int;
     typedef unsigned long long du_int;
