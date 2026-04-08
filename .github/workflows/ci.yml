@@ -1,0 +1,62 @@
+name: build packages and push cache
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: "0 6 * * *"
+
+jobs:
+  packages:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        nixpkgs-override:
+          - ""
+          - "--override-input nixpkgs github:NixOS/nixpkgs/nixos-unstable"
+          - "--override-input nixpkgs github:NixOS/nixpkgs/master"
+        event_name:
+          - "${{ github.event_name }}"
+        exclude:
+          - nixpkgs-override: ""
+            event_name: schedule
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v16
+        with:
+          name: pspdev
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+      - name: Build nix packages
+        run: |
+          nix build \
+            .#default \
+            .#psp-binutils \
+            .#psp-gcc-bootstrap \
+            .#psp-newlib \
+            .#psp-pthread-embedded \
+            .#pspsdk \
+            .#psp-sysroot \
+            .#psp-gcc \
+            .#psp-stdenv \
+            .#psplinkusb \
+            .#psplink \
+            .#psp-pacman \
+            .#psp-pkg-config \
+            .#ebootsigner \
+            .#psp-cmake \
+            --print-build-logs \
+            ${{ matrix.nixpkgs-override }}
