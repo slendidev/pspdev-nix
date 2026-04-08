@@ -9,10 +9,19 @@ on:
 
 jobs:
   packages:
-    runs-on: self-hosted
     strategy:
       max-parallel: 1
       matrix:
+        platform:
+          - name: linux-x64-self-hosted
+            runs-on:
+              - self-hosted
+              - Linux
+              - X64
+          - name: linux-arm64-ubuntu
+            runs-on: ubuntu-24.04-arm
+          - name: macos-arm64
+            runs-on: macos-14
         nixpkgs-override:
           - ""
           - "--override-input nixpkgs github:NixOS/nixpkgs/nixos-unstable"
@@ -22,6 +31,8 @@ jobs:
         exclude:
           - nixpkgs-override: ""
             event_name: schedule
+
+    runs-on: ${{ matrix.platform.runs-on }}
 
     steps:
       - name: Checkout repository
