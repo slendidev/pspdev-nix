@@ -4,6 +4,8 @@
   psp-binutils-unwrapped,
 }:
 symlinkJoin {
+  pname = "psp-binutils";
+  version = psp-binutils-unwrapped.version;
   name = "psp-binutils-${psp-binutils-unwrapped.version}";
   paths = [ psp-binutils-unwrapped ];
   nativeBuildInputs = [ makeWrapper ];

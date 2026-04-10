@@ -6,6 +6,8 @@
   psp-sysroot,
 }:
 symlinkJoin {
+  pname = "psp-gcc";
+  version = psp-gcc-unwrapped.version;
   name = "psp-gcc-${psp-gcc-unwrapped.version}";
   paths = [ psp-gcc-unwrapped ];
   nativeBuildInputs = [ makeWrapper ];
